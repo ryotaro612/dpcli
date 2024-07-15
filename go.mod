@@ -10,15 +10,12 @@ require (
 	github.com/slack-go/slack v0.13.0
 	github.com/urfave/cli/v2 v2.27.2
 	google.golang.org/api v0.188.0
-	google.golang.org/genproto v0.0.0-20240708141625-4ad9e859172b
 )
 
 require (
 	cloud.google.com/go/auth v0.7.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
 	cloud.google.com/go/compute/metadata v0.4.0 // indirect
-	cloud.google.com/go/iam v1.1.10 // indirect
-	cloud.google.com/go/secretmanager v1.13.3 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.26 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.11 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.15 // indirect
