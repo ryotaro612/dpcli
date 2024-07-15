@@ -1,4 +1,4 @@
 # binaries
-dist
+dist/*
 # Emacs
 *~
