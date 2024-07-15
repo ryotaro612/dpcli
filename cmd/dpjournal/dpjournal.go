@@ -18,7 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	_ "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
-	_ "slog"
+	_ "log/slog"
 )
 
 func main() {
