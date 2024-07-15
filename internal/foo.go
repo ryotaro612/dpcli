@@ -1,5 +1,5 @@
 package internal
 
 func a() {
-	""
+
 }
