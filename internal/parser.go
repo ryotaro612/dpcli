@@ -14,6 +14,10 @@ func Parse(args []string) error {
 				Name:    "awsprofile",
 				Aliases: []string{"p"},
 				Usage:   "The AWS profile to get credentials.",
+				Action: func(*cli.Context, string) error {
+
+					return nil
+				},
 			},
 		},
 	}
