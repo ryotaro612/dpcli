@@ -1,1 +1,3 @@
-package internal
+//go:build tools
+
+package tools
