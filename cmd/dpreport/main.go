@@ -1,4 +1,4 @@
-// Package doge
+// Package main
 package main
 
 import (

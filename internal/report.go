@@ -27,7 +27,6 @@ func Report(ctx context.Context, deps deps) error {
 		return err
 	}
 	calendar.ReadEvents()
-
 }
 
 func readWork() {
