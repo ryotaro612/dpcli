@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"github.com/ryotaro612/dpcli/internal/calendar"
 	"github.com/ryotaro612/dpcli/internal/github"
 )
 
@@ -15,11 +16,17 @@ type Option struct {
 	output       *string
 }
 
-func PostReport(ctx context.Context, deps deps) error {
+type Reporting struct {
+	github   github.Client
+	calendar calendar.Client
+}
+
+func Report(ctx context.Context, deps deps) error {
 	pullRequests, err := deps.ReadPullRequests()
 	if err != nil {
 		return err
 	}
+	calendar.ReadEvents()
 
 }
 
