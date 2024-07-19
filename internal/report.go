@@ -29,7 +29,8 @@ type template struct {
 type generator struct {
 }
 
-func (g generator) generate(t template, events []calendar.Event, pullRequests []github.PullRequest) (string, error) {
+func (g generator) generate(
+	t template, events []calendar.Event, pullRequests []github.PullRequest) (string, error) {
 	return "", nil
 }
 

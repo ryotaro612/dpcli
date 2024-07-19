@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	// _ "github.com/aws/aws-sdk-go-v2/aws"
 	// _ "github.com/aws/aws-sdk-go-v2/config"
 	// "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -22,8 +23,7 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
-
+	internal.Parse(os.Args)
 }
 
 func main2() {
