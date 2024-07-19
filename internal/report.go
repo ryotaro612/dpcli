@@ -57,5 +57,5 @@ func (r Reporting) Report(ctx context.Context) (string, error) {
 }
 
 func MakeReporting(o Option) Reporting {
-
+	return Reporting{}
 }

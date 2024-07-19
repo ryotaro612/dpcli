@@ -23,6 +23,11 @@ import (
 
 func main() {
 	ctx := context.Background()
+
+}
+
+func main2() {
+	ctx := context.Background()
 	svc, err := internal.Load(ctx)
 	if err != nil {
 		fmt.Println(err)

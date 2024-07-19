@@ -6,8 +6,9 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// ParseArgs the command line arguments.
+// Parse the command line arguments.
 func Parse(args []string) error {
+	// https://cli.urfave.org/
 	app := &cli.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
