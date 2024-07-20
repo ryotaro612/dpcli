@@ -6,9 +6,9 @@ help:
 lint: ## Lint
 	# go vet ./...
 
-dpreport: lint ## Build dpreport
+report: lint ## Build dpreport
 	mkdir -p dist
-	go build -o dist cmd/dpreport/main.go
+	go build -o cmd/dpreport/dpreport.go
 
 clean: ## Clean intermediate files
 	rm -rf dist

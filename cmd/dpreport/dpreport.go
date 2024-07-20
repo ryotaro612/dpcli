@@ -1,11 +1,14 @@
 // Package main
-package main
+package dpreport
 
 import (
 	"context"
 	"fmt"
+	"github.com/urfave/cli/v2"
 	"log"
+	"log/slog"
 	"os"
+
 	// _ "github.com/aws/aws-sdk-go-v2/aws"
 	// _ "github.com/aws/aws-sdk-go-v2/config"
 	// "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -16,14 +19,53 @@ import (
 	// _ "github.com/urfave/cli/v2" // imports as package "cli"
 	// _ "google.golang.org/api/calendar/v3"
 
+	_ "log/slog"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	_ "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
-	_ "log/slog"
 )
 
 func main() {
-	internal.Parse(os.Args)
+	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
+	err := report(logger, os.Args)
+	if err != nil {
+		logger.Error("Failure", "error", err)
+	}
+}
+
+func report(logger *slog.Logger, args []string) error {
+	// https://cli.urfave.org/
+	app := &cli.App{
+		Name:                 "dpreport",
+		EnableBashCompletion: true,
+		ArgsUsage:            "doge",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "awsprofile",
+				Aliases: []string{"p"},
+				Usage:   "The AWS profile to get credentials.",
+			},
+			&cli.StringFlag{
+				Name:    "template",
+				Aliases: []string{"t"},
+				Usage:   "A Go template file. Annotations in the template refer to activities like meeting and pull requests.",
+			},
+		},
+		Action: func(ctx *cli.Context) error {
+			aws := ctx.String("awsprofile")
+			ctx.Args()
+			fmt.Print("Hi\n")
+			fmt.Printf("%v\n %v\n", ctx, aws)
+			fmt.Printf("%v\n", aws)
+			return nil
+		},
+	}
+	if err := app.Run(args); err != nil {
+		return err
+	}
+	return nil
+
 }
 
 func main2() {
