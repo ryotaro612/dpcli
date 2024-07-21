@@ -1,4 +1,4 @@
-.PHONY: help dpjournal clean
+.PHONY: help report clean
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -8,7 +8,7 @@ lint: ## Lint
 
 report: lint ## Build dpreport
 	mkdir -p dist
-	go build -o cmd/dpreport/dpreport.go
+	go build cmd/dpreport/dpreport.go
 
 clean: ## Clean intermediate files
 	rm -rf dist

@@ -1,12 +1,11 @@
 // Package main
-package dpreport
+package main
 
 import (
 	"context"
 	"fmt"
 	"github.com/urfave/cli/v2"
 	"log"
-	"log/slog"
 	"os"
 
 	// _ "github.com/aws/aws-sdk-go-v2/aws"
@@ -27,19 +26,19 @@ import (
 )
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
-	err := report(logger, os.Args)
+	err := report(os.Args)
 	if err != nil {
-		logger.Error("Failure", "error", err)
+		internal.MakeLogger(nil).Error("Failure", "error", err)
+
 	}
 }
 
-func report(logger *slog.Logger, args []string) error {
+func report(args []string) error {
 	// https://cli.urfave.org/
 	app := &cli.App{
 		Name:                 "dpreport",
 		EnableBashCompletion: true,
-		ArgsUsage:            "doge",
+		//ArgsUsage:            "doge",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "awsprofile",
@@ -51,13 +50,22 @@ func report(logger *slog.Logger, args []string) error {
 				Aliases: []string{"t"},
 				Usage:   "A Go template file. Annotations in the template refer to activities like meeting and pull requests.",
 			},
+			&cli.BoolFlag{
+				Name:    "verbose",
+				Aliases: []string{"v"},
+				Usage:   "Prints more information.",
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 			aws := ctx.String("awsprofile")
-			ctx.Args()
-			fmt.Print("Hi\n")
-			fmt.Printf("%v\n %v\n", ctx, aws)
-			fmt.Printf("%v\n", aws)
+			template := ctx.String("template")
+			verbose := ctx.Bool("verbose")
+			reporting := internal.MakeReporting(ctx.Context, aws, verbose, template)
+			report, err := reporting.Report(ctx.Context)
+			if err != nil {
+				return err
+			}
+			fmt.Println(report)
 			return nil
 		},
 	}

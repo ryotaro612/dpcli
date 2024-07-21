@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/ryotaro612/dpcli/internal/calendar"
 	"github.com/ryotaro612/dpcli/internal/github"
+	"log/slog"
 )
 
 type deps struct {
@@ -14,6 +15,7 @@ type deps struct {
 type Option struct {
 	awsProfile   *string
 	templateFile *string
+	verbose      bool
 }
 
 type writer struct {
@@ -40,6 +42,7 @@ type Reporting struct {
 	template  template
 	generator generator
 	writer    writer
+	logger    *slog.Logger
 }
 
 func (r Reporting) Report(ctx context.Context) (string, error) {
@@ -57,6 +60,13 @@ func (r Reporting) Report(ctx context.Context) (string, error) {
 	return report, err
 }
 
-func MakeReporting(o Option) Reporting {
+// MakeReporting creates a new Reporting object with the given options.
+func MakeReporting(ctx context.Context, awsProfile string, verbose bool, template string) Reporting {
+	logOptions := &slog.HandlerOptions{Level: slog.LevelDebug}
+	if !verbose {
+		logOptions = nil
+	}
+	logger := MakeLogger(logOptions)
+
 	return Reporting{}
 }
