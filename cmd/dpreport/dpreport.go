@@ -2,10 +2,10 @@
 package main
 
 import (
-	"context"
+	_ "context"
 	"fmt"
 	"github.com/urfave/cli/v2"
-	"log"
+	_ "log"
 	"os"
 
 	// _ "github.com/aws/aws-sdk-go-v2/aws"
@@ -20,9 +20,9 @@ import (
 
 	_ "log/slog"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
+	_ "github.com/aws/aws-sdk-go-v2/aws"
 	_ "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	_ "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
 
 func main() {
@@ -60,7 +60,10 @@ func report(args []string) error {
 			aws := ctx.String("awsprofile")
 			template := ctx.String("template")
 			verbose := ctx.Bool("verbose")
-			reporting := internal.MakeReporting(ctx.Context, aws, verbose, template)
+			reporting, err := internal.MakeReporting(ctx.Context, aws, verbose, template)
+			if err != nil {
+				return err
+			}
 			report, err := reporting.Report(ctx.Context)
 			if err != nil {
 				return err
@@ -74,33 +77,4 @@ func report(args []string) error {
 	}
 	return nil
 
-}
-
-func main2() {
-	ctx := context.Background()
-	svc, err := internal.Load(ctx)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	secretName := "secret"
-
-	input := &secretsmanager.GetSecretValueInput{
-		SecretId:     aws.String(secretName),
-		VersionStage: aws.String("AWSCURRENT"), // VersionStage defaults to AWSCURRENT if unspecified
-	}
-	//fmt.Printf("svc: %v, err: %v\n", svc, err)
-
-	result, err := svc.GetSecretValue(ctx, input)
-	if err != nil {
-		// For a list of exceptions thrown, see
-		// https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
-		log.Fatal(err.Error())
-	}
-
-	// Decrypts secret using the associated KMS key.
-	//var secretString string = *result.SecretString
-	// JSONになる
-	fmt.Printf("%v\n", *result.SecretString)
-	fmt.Printf("OK")
 }

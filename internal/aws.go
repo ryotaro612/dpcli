@@ -2,7 +2,7 @@ package internal
 
 import (
 	"context"
-
+	"encoding/json"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -47,20 +47,26 @@ func NewSecretClient(c *secretsmanager.Client) SecretClient {
 }
 
 type Secret struct {
+	githubToken string
 }
 
-func (s SecretClient) Secret(ctx context.Context, secretName string) (Secret, error) {
+func (s SecretClient) Secret(ctx context.Context) (Secret, error) {
 
 	input := &secretsmanager.GetSecretValueInput{
-		SecretId: aws.String(secretName),
+		SecretId: aws.String("dpcli"),
 		//VersionStage: aws.String("AWSCURRENT"),
 	}
 
 	output, err := s.client.GetSecretValue(ctx, input)
+	secretString := output.SecretString
 
+	var secret Secret
+	if err := json.Unmarshal([]byte(*secretString), &secret); err != nil {
+		return Secret{}, err
+	}
 	if err != nil {
 		return Secret{}, err
 	}
-	return Secret{}, nil
+	return secret, nil
 
 }

@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 
 	"github.com/ryotaro612/dpcli/internal/calendar"
@@ -70,10 +69,15 @@ func MakeReporting(ctx context.Context, awsProfile string, verbose bool, templat
 	}
 	logger := MakeLogger(logOptions)
 	secretManagerClient, err := NewSecretManagerClient(ctx, awsProfile)
+	secretClient := NewSecretClient(secretManagerClient)
+	if err != nil {
+		return Reporting{}, err
+	}
+	secret, err := secretClient.Secret(ctx)
 	if err != nil {
 		return Reporting{}, err
 	}
 	//secretClient.GetSecretValue(ctx, input)
-
-	return Reporting{}
+	fmt.Printf("%v", secret)
+	return Reporting{logger: logger}, nil
 }

@@ -8,7 +8,7 @@ lint: ## Lint
 
 report: lint ## Build dpreport
 	mkdir -p dist
-	go build cmd/dpreport/dpreport.go
+	go build -o dist/dpreport cmd/dpreport/dpreport.go
 
 clean: ## Clean intermediate files
 	rm -rf dist
