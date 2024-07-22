@@ -6,21 +6,53 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
+	"log/slog"
 )
 
-func Load(ctx context.Context) (*secretsmanager.Client, error) {
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("ap-northeast-1"), config.WithSharedConfigProfile("sandbox"))
-	var svc *secretsmanager.Client
-	if err != nil {
-		return svc, err
-	}
-	svc = secretsmanager.NewFromConfig(cfg)
-	return svc, nil
+// SecretClient
+type SecretClient struct {
+	logger *slog.Logger
+	client *secretsmanager.Client
 }
 
-// NewSecretManagerClient loads a secret mananger client.
+// NewSecretClient creates a new SecretClient object.
+func NewSecretClient(ctx context.Context, logger *slog.Logger, awsProfile string) (SecretClient, error) {
+
+	c, err := newSecretManagerClient(ctx, awsProfile)
+	if err != nil {
+		return SecretClient{}, err
+	}
+	return SecretClient{logger, c}, nil
+}
+
+type Secret struct {
+	GithubToken string
+}
+
+func (s SecretClient) Secret(ctx context.Context) (Secret, error) {
+
+	input := &secretsmanager.GetSecretValueInput{
+		SecretId:     aws.String("dpcli"),
+		VersionStage: aws.String("AWSCURRENT"),
+	}
+
+	output, err := s.client.GetSecretValue(ctx, input)
+	if err != nil {
+		return Secret{}, err
+	}
+	secretString := output.SecretString
+	s.logger.Debug("secret", "secret", secretString)
+	var secret Secret
+	if err := json.Unmarshal([]byte(*secretString), &secret); err != nil {
+		return Secret{}, err
+	}
+	return secret, nil
+
+}
+
+// newSecretManagerClient loads a secret mananger client.
 // if awsProfile is an empty string, it uses the default profile.
-func NewSecretManagerClient(ctx context.Context, awsProfile string) (*secretsmanager.Client, error) {
+func newSecretManagerClient(ctx context.Context, awsProfile string) (*secretsmanager.Client, error) {
 	var cfg aws.Config
 	region := config.WithRegion("ap-northeast-1")
 	var err error
@@ -33,40 +65,5 @@ func NewSecretManagerClient(ctx context.Context, awsProfile string) (*secretsman
 		return nil, err
 	}
 	return secretsmanager.NewFromConfig(cfg), nil
-
-}
-
-// SecretClient
-type SecretClient struct {
-	client *secretsmanager.Client
-}
-
-// NewSecretClient creates a new SecretClient object.
-func NewSecretClient(c *secretsmanager.Client) SecretClient {
-	return SecretClient{c}
-}
-
-type Secret struct {
-	githubToken string
-}
-
-func (s SecretClient) Secret(ctx context.Context) (Secret, error) {
-
-	input := &secretsmanager.GetSecretValueInput{
-		SecretId: aws.String("dpcli"),
-		//VersionStage: aws.String("AWSCURRENT"),
-	}
-
-	output, err := s.client.GetSecretValue(ctx, input)
-	secretString := output.SecretString
-
-	var secret Secret
-	if err := json.Unmarshal([]byte(*secretString), &secret); err != nil {
-		return Secret{}, err
-	}
-	if err != nil {
-		return Secret{}, err
-	}
-	return secret, nil
 
 }

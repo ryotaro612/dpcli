@@ -68,8 +68,7 @@ func MakeReporting(ctx context.Context, awsProfile string, verbose bool, templat
 		logOptions = &slog.HandlerOptions{Level: slog.LevelDebug}
 	}
 	logger := MakeLogger(logOptions)
-	secretManagerClient, err := NewSecretManagerClient(ctx, awsProfile)
-	secretClient := NewSecretClient(secretManagerClient)
+	secretClient, err := NewSecretClient(ctx, logger, awsProfile)
 	if err != nil {
 		return Reporting{}, err
 	}
@@ -78,6 +77,6 @@ func MakeReporting(ctx context.Context, awsProfile string, verbose bool, templat
 		return Reporting{}, err
 	}
 	//secretClient.GetSecretValue(ctx, input)
-	fmt.Printf("%v", secret)
+	fmt.Printf("%v", secret.GithubToken)
 	return Reporting{logger: logger}, nil
 }
