@@ -3,9 +3,11 @@ package internal
 import (
 	"context"
 	"fmt"
+	"log"
+	"log/slog"
+
 	"github.com/ryotaro612/dpcli/internal/calendar"
 	"github.com/ryotaro612/dpcli/internal/github"
-	"log/slog"
 )
 
 type deps struct {
@@ -61,12 +63,17 @@ func (r Reporting) Report(ctx context.Context) (string, error) {
 }
 
 // MakeReporting creates a new Reporting object with the given options.
-func MakeReporting(ctx context.Context, awsProfile string, verbose bool, template string) Reporting {
-	logOptions := &slog.HandlerOptions{Level: slog.LevelDebug}
-	if !verbose {
-		logOptions = nil
+func MakeReporting(ctx context.Context, awsProfile string, verbose bool, template string) (Reporting, error) {
+	var logOptions *slog.HandlerOptions
+	if verbose {
+		logOptions = &slog.HandlerOptions{Level: slog.LevelDebug}
 	}
 	logger := MakeLogger(logOptions)
+	secretManagerClient, err := NewSecretManagerClient(ctx, awsProfile)
+	if err != nil {
+		return Reporting{}, err
+	}
+	//secretClient.GetSecretValue(ctx, input)
 
 	return Reporting{}
 }
