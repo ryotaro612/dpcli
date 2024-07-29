@@ -7,7 +7,10 @@ import (
 
 // MakeLogger creates a new logger with the given options.
 // The logger writes the messages in the format of JSON object to os.Stderr.
-func MakeLogger(opts *slog.HandlerOptions) *slog.Logger {
-	return slog.New(slog.NewJSONHandler(os.Stderr, opts))
-
+func MakeLogger(verbose bool) *slog.Logger {
+	var logOptions *slog.HandlerOptions
+	if verbose {
+		logOptions = &slog.HandlerOptions{Level: slog.LevelDebug}
+	}
+	return slog.New(slog.NewJSONHandler(os.Stderr, logOptions))
 }

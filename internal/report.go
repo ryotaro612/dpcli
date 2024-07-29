@@ -63,20 +63,14 @@ func (r Reporting) Report(ctx context.Context) (string, error) {
 
 // MakeReporting creates a new Reporting object with the given options.
 func MakeReporting(ctx context.Context, awsProfile string, verbose bool, template string) (Reporting, error) {
-	var logOptions *slog.HandlerOptions
-	if verbose {
-		logOptions = &slog.HandlerOptions{Level: slog.LevelDebug}
-	}
-	logger := MakeLogger(logOptions)
-	secretClient, err := NewSecretClient(ctx, logger, awsProfile)
+	logger := MakeLogger(verbose)
+	var r Reporting
+	s, err := ReadSecret(ctx, logger, awsProfile)
 	if err != nil {
-		return Reporting{}, err
+		return r, err
 	}
-	secret, err := secretClient.Secret(ctx)
-	if err != nil {
-		return Reporting{}, err
-	}
+
 	//secretClient.GetSecretValue(ctx, input)
-	fmt.Printf("%v", secret.GithubToken)
+	fmt.Printf("foobar %v dge", s.GithubToken)
 	return Reporting{logger: logger}, nil
 }

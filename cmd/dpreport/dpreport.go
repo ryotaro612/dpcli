@@ -28,8 +28,7 @@ import (
 func main() {
 	err := report(os.Args)
 	if err != nil {
-		internal.MakeLogger(nil).Error("Failure", "error", err)
-
+		internal.MakeLogger(false).Error("Failure", "error", err)
 	}
 }
 
@@ -38,6 +37,8 @@ func report(args []string) error {
 	app := &cli.App{
 		Name:                 "dpreport",
 		EnableBashCompletion: true,
+		// make the help subcommand disable.
+		HideHelpCommand: true,
 		//ArgsUsage:            "doge",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
