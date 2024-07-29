@@ -69,6 +69,7 @@ func MakeReporting(ctx context.Context, awsProfile string, verbose bool, templat
 	if err != nil {
 		return r, err
 	}
+	g := github.NewClient(logger, s.GithubToken)
 
 	//secretClient.GetSecretValue(ctx, input)
 	fmt.Printf("foobar %v dge", s.GithubToken)
