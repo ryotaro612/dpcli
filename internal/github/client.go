@@ -12,17 +12,15 @@ type Client struct {
 	client *github.Client
 }
 
-type PullRequest struct{}
-
-func (c Client) ReadPullRequests(ctx context.Context) ([]PullRequest, error) {
-	reqs, resp, err := c.client.PullRequests.List(ctx, "alpdr", "data-platform", &github.PullRequestListOptions{
+func (c Client) ReadPullRequests(ctx context.Context, date Date) ([]*github.PullRequest, error) {
+	prs, _, err := c.client.PullRequests.List(ctx, "alpdr", "data-platform", &github.PullRequestListOptions{
 		State: "all",
 	})
 
 	if err != nil {
 		return nil, err
 	}
-	return []PullRequest{}, nil
+	return prs, nil
 }
 
 func NewClient(l *slog.Logger, gitHubToken string) Client {

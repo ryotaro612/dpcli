@@ -4,9 +4,10 @@ package main
 import (
 	_ "context"
 	"fmt"
-	"github.com/urfave/cli/v2"
 	_ "log"
 	"os"
+
+	"github.com/urfave/cli/v2"
 
 	// _ "github.com/aws/aws-sdk-go-v2/aws"
 	// _ "github.com/aws/aws-sdk-go-v2/config"
@@ -20,6 +21,7 @@ import (
 
 	_ "log/slog"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	_ "github.com/aws/aws-sdk-go-v2/aws"
 	_ "github.com/aws/aws-sdk-go-v2/config"
 	_ "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
@@ -33,6 +35,9 @@ func main() {
 }
 
 func report(args []string) error {
+	awsProfile := "awsProfile"
+	template := "template"
+	verbose := "verbose"
 	// https://cli.urfave.org/
 	app := &cli.App{
 		Name:                 "dpreport",
@@ -42,25 +47,25 @@ func report(args []string) error {
 		//ArgsUsage:            "doge",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "awsprofile",
+				Name:    awsProfile,
 				Aliases: []string{"p"},
 				Usage:   "The AWS profile to get credentials.",
 			},
 			&cli.StringFlag{
-				Name:    "template",
+				Name:    template,
 				Aliases: []string{"t"},
 				Usage:   "A Go template file. Annotations in the template refer to activities like meeting and pull requests.",
 			},
 			&cli.BoolFlag{
-				Name:    "verbose",
+				Name:    verbose,
 				Aliases: []string{"v"},
 				Usage:   "Prints more information.",
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			aws := ctx.String("awsprofile")
-			template := ctx.String("template")
-			verbose := ctx.Bool("verbose")
+			aws := ctx.String(awsProfile)
+			template := ctx.String(template)
+			verbose := ctx.Bool(verbose)
 			reporting, err := internal.MakeReporting(ctx.Context, aws, verbose, template)
 			if err != nil {
 				return err
