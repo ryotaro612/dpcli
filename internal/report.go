@@ -109,7 +109,7 @@ func newGenerator(file string) (generator, error) {
 	return generator{
 		template: `
 - ■ やったこと
-{{range .}}{{- if eq .Login "ryotaro612" }}{{ printf "  - [%s](%s)\n" .Title .URL }}{{ end }}{{end}}
+{{range .}}{{- if eq .Login "ryotaro612" }}{{ printf "  - %s\n" .Title }}{{ end }}{{end}}
 - ■ やること
 - ■ 困っていること/ひとこと
 `,
