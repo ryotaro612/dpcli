@@ -75,7 +75,6 @@ func NewReporting(ctx context.Context, awsProfile string, verbose bool, template
 		return r, err
 	}
 	g := github.NewClient(logger, s.GithubToken)
-	fmt.Printf("foobar %v dge", s.GithubToken)
 	return Reporting{github: &g, logger: logger}, nil
 }
 
@@ -85,10 +84,13 @@ func calcOffset(current time.Time) (time.Time, error) {
 		return current, err
 	}
 	year, month, day := current.In(loc).Date()
-	if time.Date(year, month, day, 11, 0, 0, 0, loc).After(current) {
-		return time.Date(year, month, day, 11, 0, 0, 0, loc).AddDate(0, 0, -1), nil
+	meeting := time.Date(year, month, day, 11, 0, 0, 0, loc)
+	if meeting.After(current) {
+		if meeting.Weekday() == time.Monday {
+			return meeting.AddDate(0, 0, -3), nil
+		}
+		return meeting.AddDate(0, 0, -1), nil
 
 	}
-	return time.Date(year, month, day, 11, 0, 0, 0, loc), nil
-
+	return meeting, nil
 }
