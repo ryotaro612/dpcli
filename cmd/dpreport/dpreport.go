@@ -21,7 +21,6 @@ import (
 
 	_ "log/slog"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	_ "github.com/aws/aws-sdk-go-v2/aws"
 	_ "github.com/aws/aws-sdk-go-v2/config"
 	_ "github.com/aws/aws-sdk-go-v2/service/secretsmanager"

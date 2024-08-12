@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	g "github.com/google/go-github/v63/github"
 	"github.com/ryotaro612/dpcli/internal/calendar"
 	"github.com/ryotaro612/dpcli/internal/github"
 	"log/slog"
@@ -33,7 +34,7 @@ type generator struct {
 }
 
 func (g generator) generate(
-	t template, events []calendar.Event, pullRequests []github.PullRequest) (string, error) {
+	t template, events []calendar.Event, pullRequests []*g.PullRequest) (string, error) {
 	return "", nil
 }
 
