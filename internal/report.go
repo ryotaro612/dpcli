@@ -1,12 +1,15 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"log/slog"
+	"text/template"
+	"time"
+
 	gh "github.com/google/go-github/v63/github"
 	"github.com/ryotaro612/dpcli/internal/github"
-	"log/slog"
-	"time"
 )
 
 type deps struct {
@@ -38,13 +41,9 @@ func (r *Reporting) ReportOffset(ctx context.Context, offset time.Time) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(pullRequests)
-	if err != nil {
-		return err
-	}
-	r.generator.generate(r.template, pullRequests)
-
-	return nil
+	converted := convertPullRequests(pullRequests)
+	err = r.generator.generate(&converted)
+	return err
 }
 
 // NewReporting creates a new Reporting object with the given options.
@@ -84,12 +83,54 @@ type generator struct {
 	template string
 }
 
-func (g *generator) generate(pullRequests []*gh.PullRequest) error {
+func (g *generator) generate(pullRequests *[]TemplatePullRequest) error {
+	tmpl, err := template.New("report").Parse(g.template)
+
+	if err != nil {
+		return err
+	}
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, pullRequests)
+	if err != nil {
+		return err
+	}
+	a := buf.String()
+	fmt.Printf(a)
+
+	// 	tmpl, err := template.New("test").Parse("{{.Count}} items are made of {{.Material}}")
+	// if err != nil { panic(err) }
+
+	// if err != nil { panic(err) }
 	return nil
 }
 
 func newGenerator(file string) (generator, error) {
 
-	return generator{}, nil
+	return generator{
+		template: `
+- ■ やったこと
+{{range .}}{{- if eq .Login "ryotaro612" }}{{ printf "  - [%s](%s)\n" .Title .URL }}{{ end }}{{end}}
+- ■ やること
+- ■ 困っていること/ひとこと
+`,
+	}, nil
 
+}
+
+type TemplatePullRequest struct {
+	Title string
+	Login string
+	URL   string
+}
+
+func convertPullRequests(pullRequests []*gh.PullRequest) []TemplatePullRequest {
+	var tprs []TemplatePullRequest
+	for _, pr := range pullRequests {
+		tprs = append(tprs, TemplatePullRequest{
+			Title: *pr.Title,
+			Login: *pr.User.Login,
+			URL:   *pr.URL,
+		})
+	}
+	return tprs
 }
