@@ -30,7 +30,7 @@ import (
 func main() {
 	err := report(os.Args)
 	if err != nil {
-		internal.MakeLogger(false).Error("Failure", "error", err)
+		internal.NewLogger(false).Error("Failure", "error", err)
 	}
 }
 
@@ -66,7 +66,7 @@ func report(args []string) error {
 			aws := ctx.String(awsProfile)
 			template := ctx.String(template)
 			verbose := ctx.Bool(verbose)
-			reporting, err := internal.MakeReporting(ctx.Context, aws, verbose, template)
+			reporting, err := internal.NewReporting(ctx.Context, aws, verbose, template)
 			if err != nil {
 				return err
 			}

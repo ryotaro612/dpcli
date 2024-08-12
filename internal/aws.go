@@ -9,6 +9,7 @@ import (
 	"log/slog"
 )
 
+// Secret is a struct that aggregates credentias.
 type Secret struct {
 	GithubToken string
 }

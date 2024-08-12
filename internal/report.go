@@ -3,10 +3,10 @@ package internal
 import (
 	"context"
 	"fmt"
-	"log/slog"
-
 	"github.com/ryotaro612/dpcli/internal/calendar"
 	"github.com/ryotaro612/dpcli/internal/github"
+	"log/slog"
+	"time"
 )
 
 type deps struct {
@@ -38,7 +38,7 @@ func (g generator) generate(
 }
 
 type Reporting struct {
-	github    github.Client
+	github    *github.Client
 	calendar  calendar.Client
 	template  template
 	generator generator
@@ -47,7 +47,11 @@ type Reporting struct {
 }
 
 func (r Reporting) Report(ctx context.Context) (string, error) {
-	pullRequests, err := r.github.ReadPullRequests()
+	offset, err := calcOffset(time.Now())
+	if err != nil {
+		return "", err
+	}
+	pullRequests, err := r.github.ReadPullRequests(ctx, offset)
 	if err != nil {
 		return "", err
 	}
@@ -61,17 +65,29 @@ func (r Reporting) Report(ctx context.Context) (string, error) {
 	return report, err
 }
 
-// MakeReporting creates a new Reporting object with the given options.
-func MakeReporting(ctx context.Context, awsProfile string, verbose bool, template string) (Reporting, error) {
-	logger := MakeLogger(verbose)
+// NewReporting creates a new Reporting object with the given options.
+func NewReporting(ctx context.Context, awsProfile string, verbose bool, template string) (Reporting, error) {
+	logger := NewLogger(verbose)
 	var r Reporting
 	s, err := ReadSecret(ctx, logger, awsProfile)
 	if err != nil {
 		return r, err
 	}
 	g := github.NewClient(logger, s.GithubToken)
-
-	//secretClient.GetSecretValue(ctx, input)
 	fmt.Printf("foobar %v dge", s.GithubToken)
-	return Reporting{logger: logger}, nil
+	return Reporting{github: &g, logger: logger}, nil
+}
+
+func calcOffset(current time.Time) (time.Time, error) {
+	loc, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		return current, err
+	}
+	year, month, day := current.In(loc).Date()
+	if time.Date(year, month, day, 11, 0, 0, 0, loc).After(current) {
+		return time.Date(year, month, day, 11, 0, 0, 0, loc).AddDate(0, 0, -1), nil
+
+	}
+	return time.Date(year, month, day, 11, 0, 0, 0, loc), nil
+
 }
