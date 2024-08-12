@@ -3,9 +3,9 @@ package main
 
 import (
 	_ "context"
-	"fmt"
 	_ "log"
 	"os"
+	"time"
 
 	"github.com/urfave/cli/v2"
 
@@ -37,6 +37,7 @@ func report(args []string) error {
 	awsProfile := "awsProfile"
 	template := "template"
 	verbose := "verbose"
+	pullRequestsAfter := "prafter"
 	// https://cli.urfave.org/
 	app := &cli.App{
 		Name:                 "dpreport",
@@ -60,21 +61,30 @@ func report(args []string) error {
 				Aliases: []string{"v"},
 				Usage:   "Prints more information.",
 			},
+			&cli.StringFlag{
+				Name:    pullRequestsAfter,
+				Aliases: []string{"r"},
+				Usage:   "Read pull requests created after the specified datetime. The format is like 2006-01-02 15:04:05",
+			},
 		},
 		Action: func(ctx *cli.Context) error {
 			aws := ctx.String(awsProfile)
 			template := ctx.String(template)
 			verbose := ctx.Bool(verbose)
+			after := ctx.String(pullRequestsAfter)
 			reporting, err := internal.NewReporting(ctx.Context, aws, verbose, template)
 			if err != nil {
 				return err
 			}
-			report, err := reporting.Report(ctx.Context)
-			if err != nil {
-				return err
+			if after != "" {
+				//time.Parse(DateTime   = "2006-01-02 15:04:05")
+				parsed, err := time.Parse(time.DateTime, after)
+				if err != nil {
+					return err
+				}
+				return reporting.ReportOffset(ctx.Context, parsed)
 			}
-			fmt.Println(report)
-			return nil
+			return reporting.Report(ctx.Context)
 		},
 	}
 	if err := app.Run(args); err != nil {

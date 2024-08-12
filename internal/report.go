@@ -3,8 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
-	g "github.com/google/go-github/v63/github"
-	"github.com/ryotaro612/dpcli/internal/calendar"
+	gh "github.com/google/go-github/v63/github"
 	"github.com/ryotaro612/dpcli/internal/github"
 	"log/slog"
 	"time"
@@ -20,50 +19,32 @@ type Option struct {
 	verbose      bool
 }
 
-type writer struct {
-}
-
-func (w writer) Writer() {
-
-}
-
-type template struct {
-}
-
-type generator struct {
-}
-
-func (g generator) generate(
-	t template, events []calendar.Event, pullRequests []*g.PullRequest) (string, error) {
-	return "", nil
-}
-
 type Reporting struct {
 	github    *github.Client
-	calendar  calendar.Client
-	template  template
-	generator generator
-	writer    writer
+	generator *generator
 	logger    *slog.Logger
 }
 
-func (r Reporting) Report(ctx context.Context) (string, error) {
+func (r *Reporting) Report(ctx context.Context) error {
 	offset, err := calcOffset(time.Now())
 	if err != nil {
-		return "", err
+		return err
 	}
+	return r.ReportOffset(ctx, offset)
+}
+
+func (r *Reporting) ReportOffset(ctx context.Context, offset time.Time) error {
 	pullRequests, err := r.github.ReadPullRequests(ctx, offset)
 	if err != nil {
-		return "", err
+		return err
 	}
 	fmt.Println(pullRequests)
-	events, err := r.calendar.ReadEvents()
 	if err != nil {
-		return "", err
+		return err
 	}
-	report, err := r.generator.generate(r.template, events, pullRequests)
+	r.generator.generate(r.template, pullRequests)
 
-	return report, err
+	return nil
 }
 
 // NewReporting creates a new Reporting object with the given options.
@@ -75,7 +56,11 @@ func NewReporting(ctx context.Context, awsProfile string, verbose bool, template
 		return r, err
 	}
 	g := github.NewClient(logger, s.GithubToken)
-	return Reporting{github: &g, logger: logger}, nil
+	gen, err := newGenerator(template)
+	if err != nil {
+		return r, err
+	}
+	return Reporting{github: &g, generator: &gen, logger: logger}, nil
 }
 
 func calcOffset(current time.Time) (time.Time, error) {
@@ -93,4 +78,18 @@ func calcOffset(current time.Time) (time.Time, error) {
 
 	}
 	return meeting, nil
+}
+
+type generator struct {
+	template string
+}
+
+func (g *generator) generate(pullRequests []*gh.PullRequest) error {
+	return nil
+}
+
+func newGenerator(file string) (generator, error) {
+
+	return generator{}, nil
+
 }

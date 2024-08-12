@@ -29,7 +29,6 @@ func (c *Client) ReadPullRequests(ctx context.Context, offset time.Time) ([]*git
 		if res.StatusCode/100 != 2 {
 			return nil, fmt.Errorf("unexpected status code: %d", res.StatusCode)
 		}
-		fmt.Println(next)
 		if len(next) == 0 {
 			done = true
 		}
